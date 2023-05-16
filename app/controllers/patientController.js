@@ -29,16 +29,13 @@ exports.createPatient = async (req, res, next) => {
   try {
     //prepare CUS-ID
     const latestDocument = await Patient.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
-    console.log(latestDocument)
     if (latestDocument.length === 0) data = { ...data, seq: '1', patientID: "CUS-1" } // if seq is undefined set initial patientID and seq
-    console.log(data)
     if (latestDocument.length) {
       const increment = latestDocument[0].seq + 1
       data = { ...data, patientID: "CUS-" + increment, seq: increment }
     }
 
     //img preparation
-    console.log(files.img, 'files.img')
     if (files.img) {
       let imgPath = files.img[0].path.split('cherry-k')[1];
       const attachData = {
@@ -64,10 +61,12 @@ exports.createPatient = async (req, res, next) => {
 };
 
 exports.updatePatient = async (req, res, next) => {
+  let data = req.body
   try {
+    data = {...data, updatedAt:Date.now()} // updating updatedAt
     const result = await Patient.findOneAndUpdate(
-      { _id: req.body.id },
-      req.body,
+      { _id: data.id },
+      data,
       { new: true },
     ).populate('img')
     return res.status(200).send({ success: true, data: result });
