@@ -1,4 +1,4 @@
-# Cherry-K Clinic REST API
+# Impatient Module API
 
 ## Installation
 
