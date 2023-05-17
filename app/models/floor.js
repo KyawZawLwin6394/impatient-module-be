@@ -5,16 +5,20 @@ mongoose.promise = global.Promise;
 const Schema = mongoose.Schema;
 const validator = require('validator');
 
-let BuildingSchema = new Schema({
+let FloorSchema = new Schema({
     code: {
         type: String
     },
     name: {
         type: String
     },
-    buildingType:{
-        type: String,
-        enum: ['Twin Double Flat', 'Single Flat', 'Double Flat']
+    relatedBuilding:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Buildings'
+    },
+    floorCount: {
+        type: Number,
+        required:true
     },
     createdAt: {
         type: Date,
@@ -30,7 +34,7 @@ let BuildingSchema = new Schema({
     }
 });
 
-const patient = mongoose.model('Buildings', BuildingSchema)
+const patient = mongoose.model('Floors', FloorSchema)
 module.exports = patient;
 
 

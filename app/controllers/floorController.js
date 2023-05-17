@@ -1,35 +1,35 @@
 'use strict';
-const Building = require('../models/building');
+const Floor = require('../models/floor');
 
-exports.listAllBuildings = async (req, res) => {
+exports.listAllFloors = async (req, res) => {
     try {
-        let result = await Building.find({ isDeleted: false })
-        let count = await Building.find({ isDeleted: false }).count();
+        let result = await Floor.find({ isDeleted: false }).populate('relatedBuilding')
+        let count = await Floor.find({ isDeleted: false }).count();
         res.status(200).send({
             success: true,
             count: count,
             data: result
         });
-        if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
+        if (result.length === 0) return res.status(404).send({error:true, message:'No Record Found!'})
     } catch (error) {
         return res.status(500).send({ error: true, message: error.message });
     }
 };
 
-exports.getBuilding = async (req, res) => {
-    const result = await Building.find({ _id: req.params.id, isDeleted: false })
+exports.getFloor = async (req, res) => {
+    const result = await Floor.find({ _id: req.params.id, isDeleted: false }).populate('relatedBuilding')
     if (result.length === 0 )
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
 };
 
-exports.createBuilding = async (req, res, next) => {
+exports.createFloor = async (req, res, next) => {
     let data = req.body;
     try {
-        const newBuilding = new Building(data);
-        const result = await newBuilding.save();
+        const newFloor = new Floor(data);
+        const result = await newFloor.save();
         res.status(200).send({
-            message: 'Building create success',
+            message: 'Floor create success',
             success: true,
             data: result
         });
@@ -38,24 +38,24 @@ exports.createBuilding = async (req, res, next) => {
     }
 };
 
-exports.updateBuilding = async (req, res, next) => {
+exports.updateFloor = async (req, res, next) => {
     let data = req.body;
     try {
         data = { ...data, updatedAt: Date.now() } // updating updatedAt
-        const result = await Building.findOneAndUpdate(
+        const result = await Floor.findOneAndUpdate(
             { _id: data.id },
             data,
             { new: true },
-        )
+        ).populate('relatedBuilding')
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })
     }
 };
 
-exports.deleteBuilding = async (req, res, next) => {
+exports.deleteFloor = async (req, res, next) => {
     try {
-        const result = await Building.findOneAndUpdate(
+        const result = await Floor.findOneAndUpdate(
             { _id: req.params.id },
             { isDeleted: true },
             { new: true },
@@ -67,9 +67,9 @@ exports.deleteBuilding = async (req, res, next) => {
     }
 };
 
-exports.activateBuilding = async (req, res, next) => {
+exports.activateFloor = async (req, res, next) => {
     try {
-        const result = await Building.findOneAndUpdate(
+        const result = await Floor.findOneAndUpdate(
             { _id: req.params.id },
             { isDeleted: false },
             { new: true },
@@ -80,14 +80,14 @@ exports.activateBuilding = async (req, res, next) => {
     }
 };
 
-// exports.filterBuildings = async (req, res, next) => {
+// exports.filterFloors = async (req, res, next) => {
 //   try {
 //     let query = {}
 //     const { name,code } = req.query
 //     if (name) query.name = name
 //     if (code) query.code = code
 //     if (Object.keys(query).length === 0) return res.status(404).send({error:true, message: 'Please Specify A Query To Use This Function'})
-//     const result = await Building.find(query)
+//     const result = await Floor.find(query)
 //     if (result.length === 0) return res.status(404).send({ error: true, message: "No Record Found!" })
 //     res.status(200).send({ success: true, data: result })
 //   } catch (err) {
@@ -95,10 +95,10 @@ exports.activateBuilding = async (req, res, next) => {
 //   }
 // }
 
-// exports.searchBuildings = async (req, res, next) => {
+// exports.searchFloors = async (req, res, next) => {
 //   try {
 //     console.log(req.body.search)
-//     const result = await Building.find({ $text: { $search: req.query.search } })
+//     const result = await Floor.find({ $text: { $search: req.query.search } })
 //     if (result.length===0) return res.status(404).send({error:true, message:'No Record Found!'})
 //     return res.status(200).send({ success: true, data: result })
 //   } catch (err) {

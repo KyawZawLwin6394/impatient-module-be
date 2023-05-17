@@ -11,14 +11,15 @@ exports.listAllPatients = async (req, res) => {
       count: count,
       data: result
     });
+    if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
   } catch (error) {
-    return res.status(500).send({ error: true, message: 'No Record Found!' });
+    return res.status(500).send({ error: true, message: error.message });
   }
 };
 
 exports.getPatient = async (req, res) => {
   const result = await Patient.find({ _id: req.params.id, isDeleted: false }).populate('img')
-  if (!result)
+  if (result.length === 0 )
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
@@ -63,7 +64,7 @@ exports.createPatient = async (req, res, next) => {
 exports.updatePatient = async (req, res, next) => {
   let data = req.body
   try {
-    data = {...data, updatedAt:Date.now()} // updating updatedAt
+    data = { ...data, updatedAt: Date.now() } // updating updatedAt
     const result = await Patient.findOneAndUpdate(
       { _id: data.id },
       data,
